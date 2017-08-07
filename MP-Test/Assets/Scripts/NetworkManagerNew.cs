@@ -8,7 +8,7 @@ public class NetworkManagerNew : NetworkManager {
 	void Start()
 	{
         SetupButtons();
-        NetworkManager.singleton.networkAddress = "2602:304:6824:c0e0:994f:cfae:f45e:1e8a";//"70.130.76.14";
+        NetworkManager.singleton.networkAddress = "70.130.76.14";//"2602:304:6824:c0e0:994f:cfae:f45e:1e8a";;
         NetworkManager.singleton.networkPort = 4040;
 	}
 
@@ -30,6 +30,11 @@ public class NetworkManagerNew : NetworkManager {
     }
     void StartServer(){}
  
+    void Update()
+    {
+        Debug.Log("Address: " + NetworkManager.singleton.networkAddress);
+    }
+
     /*public void JoinGame()
     {
         SetIPAddress();
