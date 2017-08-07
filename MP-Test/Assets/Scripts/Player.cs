@@ -191,4 +191,10 @@ public class Player : NetworkBehaviour {
 		}
 		return false;
 	}
+
+	private void Jump()
+	{
+		myRB.AddForce(new Vector2(0, JUMP_FORCE));
+		
+	}
 }
