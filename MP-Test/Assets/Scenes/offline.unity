@@ -764,7 +764,7 @@ MonoBehaviour:
   matchMaker: {fileID: 0}
   connectDirectly: 1
   connectPunchthrough: 1
-  connectRelay: 1
+  connectRelay: 0
   autoConnectToFacilitator: 1
   useUnityMatchmaking: 1
   externalIPSource: http://ipv4.icanhazip.com
@@ -783,8 +783,8 @@ MonoBehaviour:
   m_Script: {fileID: -1989760260, guid: 10e2d4519547ee540bfcbb29e3236ab7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  facilitatorIP: woc.dev
-  facilitatorPort: 61111
+  facilitatorIP: 174.138.39.122
+  facilitatorPort: 4040
   facilitatorTimeOut: 15
   facilitatorRetryAttempts: 2
   portForwardingEnabled: 1
