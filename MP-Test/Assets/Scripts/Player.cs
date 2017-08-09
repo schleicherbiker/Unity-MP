@@ -7,7 +7,7 @@ public class Player : NetworkBehaviour {
 	
 	// Character Attributes
 	[SerializeField] private float MOVEMENT_SPEED;
-	[SerializeField] private float JUMP_FORCE;
+	[SerializeField] private float JUMP_SPEED;
 
 	[SyncVar(hook = "SetDir")] public bool facingRight;
 	private float horizontal;
@@ -19,7 +19,7 @@ public class Player : NetworkBehaviour {
 
 	// Jumping stuff?
 	private bool attack;
-	[SerializeField] private Transform[] groundPoints;
+	[SerializeField] private Transform[] groundCollider;
 	[SerializeField] private float groundRadius;
 	[SerializeField] private LayerMask whatIsGround;
 	private bool isGrounded;
@@ -63,7 +63,7 @@ public class Player : NetworkBehaviour {
 		// Get Horizontal Input and Handle Movement
 		horizontal = Input.GetAxis("Horizontal");
 		HandleMovement(horizontal);
-
+		
 		// TODO
 		isGrounded = IsGrounded();
 		HandleAttacks();
@@ -80,11 +80,7 @@ public class Player : NetworkBehaviour {
 		else {
 			myRB.velocity = new Vector2(horizontal * MOVEMENT_SPEED, myRB.velocity.y);
 		}
-		// Handle Jumping
-		if (isGrounded && jump) {
-			isGrounded = false;
-			myRB.AddForce(new Vector2(0, JUMP_FORCE));
-		}
+
 		// Set Animator Speed
 		myAnimator.SetFloat("speed", Mathf.Abs(horizontal));
 
@@ -114,6 +110,10 @@ public class Player : NetworkBehaviour {
 				// Update Server with [Command] Call
 				CmdUpdateServerDir(false);
 			}
+		}
+
+		if (Input.GetKey(KeyCode.Space)) {
+			Jump();
 		}
 	}
 
@@ -173,31 +173,47 @@ public class Player : NetworkBehaviour {
 		jump = false;
 	}
 
-	private bool IsGrounded() {
-		// If falling...
-		//if (myRB.velocity.y <= 0) {
-			Vector2 topLeft = new Vector2(transform.position.x + myCollider.offset.x - (myCollider.size.x / 2f), transform.position.y + myCollider.offset.y - (myCollider.size.y / 2f));
-			Vector2 bottomRight = new Vector2(transform.position.x + myCollider.offset.x + (myCollider.size.x / 2f), transform.position.y + myCollider.offset.y - (myCollider.size.y / 2f) - .2f);
+	private bool IsGrounded()
+	{
+		if (myRB.velocity.y <= 0)
+		{
+			Vector2 topLeft, bottomRight;
+
+
+			if (transform.localScale.x == 1) {
+				topLeft = new Vector2(myCollider.transform.position.x + myCollider.offset.x - (myCollider.size.x / 2f) + .1f, myCollider.transform.position.y + myCollider.offset.y - (myCollider.size.y / 2f));
+				bottomRight = new Vector2(myCollider.transform.position.x + myCollider.offset.x + (myCollider.size.x / 2f) -.1f, myCollider.transform.position.y + myCollider.offset.y - (myCollider.size.y / 2f) - .01f);
+				Debug.DrawLine(topLeft, bottomRight, Color.yellow);
+			} else {
+				topLeft = new Vector2(myCollider.transform.position.x - myCollider.offset.x - (myCollider.size.x / 2f) + .1f, myCollider.transform.position.y + myCollider.offset.y - (myCollider.size.y / 2f));
+				bottomRight = new Vector2(myCollider.transform.position.x - myCollider.offset.x + (myCollider.size.x / 2f) -.1f, myCollider.transform.position.y + myCollider.offset.y - (myCollider.size.y / 2f) - .01f);
+				Debug.DrawLine(topLeft, bottomRight, Color.yellow);
+			}
+			
+
 			Collider2D[] colliders = Physics2D.OverlapAreaAll(topLeft, bottomRight, whatIsGround);
 			for (int i=0; i<colliders.Length; i++) {
+				Debug.Log(colliders[i]);
 			 	if (colliders[i].gameObject != gameObject) { // If the item im colliding with isnt the player...
 					return true;
 			 	}
-				Debug.Log(colliders[i]);
 			}
-			
-		//}
+		}
 		return false;
 	}
 
 	private void Jump()
 	{
 		if (isGrounded)
-			myRB.AddForce(new Vector2(0, JUMP_FORCE));
-		else if (canDoubleJump)
 		{
-			myRB.AddForce(new Vector2(0, JUMP_FORCE));
-			canDoubleJump = false;
+			myRB.AddForce(new Vector2(0, JUMP_SPEED));
+			isGrounded = false;
 		}
+			
+		// else if (canDoubleJump)
+		// {
+		// 	myRB.AddForce(new Vector2(0, JUMP_SPEED));
+		// 	canDoubleJump = false;
+		// }
 	}
 }

@@ -259,16 +259,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad2f143e26ee3e94084f179b5833d34e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  movementSpeed: 6
-  groundPoints:
-  - {fileID: 4015044099401542}
-  - {fileID: 4459003500673160}
-  - {fileID: 4571753938949886}
+  MOVEMENT_SPEED: 0
+  JUMP_FORCE: 0
+  facingRight: 0
+  groundCollider: []
   groundRadius: 0.2
   whatIsGround:
     serializedVersion: 2
     m_Bits: 4294967295
-  jumpForce: 500
 --- !u!212 &212284787125180140
 SpriteRenderer:
   m_ObjectHideFlags: 1
