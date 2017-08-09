@@ -111,10 +111,6 @@ public class Player : NetworkBehaviour {
 				CmdUpdateServerDir(false);
 			}
 		}
-
-		if (Input.GetKey(KeyCode.Space)) {
-			Jump();
-		}
 	}
 
 	private void HandleAttacks() {
@@ -129,7 +125,9 @@ public class Player : NetworkBehaviour {
 			attack = true;
 		}
 
-		if (Input.GetKey(KeyCode.Space)) {
+		if (Input.GetKeyDown(KeyCode.Space))
+		{
+			Debug.Log("jump!");
 			Jump();
 		}
 	}
@@ -179,22 +177,25 @@ public class Player : NetworkBehaviour {
 		{
 			Vector2 topLeft, bottomRight;
 
-
-			if (transform.localScale.x == 1) {
+			if (transform.localScale.x == 1)
+			{
 				topLeft = new Vector2(myCollider.transform.position.x + myCollider.offset.x - (myCollider.size.x / 2f) + .1f, myCollider.transform.position.y + myCollider.offset.y - (myCollider.size.y / 2f));
-				bottomRight = new Vector2(myCollider.transform.position.x + myCollider.offset.x + (myCollider.size.x / 2f) -.1f, myCollider.transform.position.y + myCollider.offset.y - (myCollider.size.y / 2f) - .01f);
+				bottomRight = new Vector2(myCollider.transform.position.x + myCollider.offset.x + (myCollider.size.x / 2f) -.1f, myCollider.transform.position.y + myCollider.offset.y - (myCollider.size.y / 2f) - .001f);
 				Debug.DrawLine(topLeft, bottomRight, Color.yellow);
-			} else {
+			} 
+			else 
+			{
 				topLeft = new Vector2(myCollider.transform.position.x - myCollider.offset.x - (myCollider.size.x / 2f) + .1f, myCollider.transform.position.y + myCollider.offset.y - (myCollider.size.y / 2f));
-				bottomRight = new Vector2(myCollider.transform.position.x - myCollider.offset.x + (myCollider.size.x / 2f) -.1f, myCollider.transform.position.y + myCollider.offset.y - (myCollider.size.y / 2f) - .01f);
+				bottomRight = new Vector2(myCollider.transform.position.x - myCollider.offset.x + (myCollider.size.x / 2f) -.1f, myCollider.transform.position.y + myCollider.offset.y - (myCollider.size.y / 2f) - .001f);
 				Debug.DrawLine(topLeft, bottomRight, Color.yellow);
 			}
 			
-
 			Collider2D[] colliders = Physics2D.OverlapAreaAll(topLeft, bottomRight, whatIsGround);
-			for (int i=0; i<colliders.Length; i++) {
-				Debug.Log(colliders[i]);
-			 	if (colliders[i].gameObject != gameObject) { // If the item im colliding with isnt the player...
+			for (int i=0; i<colliders.Length; i++)
+			{
+			 	if (colliders[i].gameObject != gameObject) 
+				{
+					canDoubleJump = true;
 					return true;
 			 	}
 			}
@@ -206,14 +207,15 @@ public class Player : NetworkBehaviour {
 	{
 		if (isGrounded)
 		{
-			myRB.AddForce(new Vector2(0, JUMP_SPEED));
+			Debug.Log("Normal Jump!");
+			myRB.velocity = new Vector2(myRB.velocity.x, JUMP_SPEED);
 			isGrounded = false;
+		}	
+		else if (canDoubleJump)
+		{
+			Debug.Log("Double Jump!");
+			myRB.velocity = new Vector2(myRB.velocity.x, JUMP_SPEED);
+			canDoubleJump = false;
 		}
-			
-		// else if (canDoubleJump)
-		// {
-		// 	myRB.AddForce(new Vector2(0, JUMP_SPEED));
-		// 	canDoubleJump = false;
-		// }
 	}
 }
