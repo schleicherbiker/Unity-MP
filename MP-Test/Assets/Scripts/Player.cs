@@ -6,8 +6,8 @@ using UnityEngine.Networking;
 public class Player : NetworkBehaviour {
 	
 	// Character Attributes
-	private float MOVEMENT_SPEED;
-	private float JUMP_FORCE;
+	[SerializeField] private float MOVEMENT_SPEED;
+	[SerializeField] private float JUMP_FORCE;
 
 	[SyncVar(hook = "SetDir")] public bool facingRight;
 	private float horizontal;
@@ -15,29 +15,25 @@ public class Player : NetworkBehaviour {
 	// Character References
 	private Rigidbody2D myRB; 
 	private Animator myAnimator;
+	private BoxCollider2D myCollider;
 
 	// Jumping stuff?
 	private bool attack;
-	[SerializeField]
-	private Transform[] groundPoints;
-	[SerializeField]
-	private float groundRadius;
-	[SerializeField]
-	private LayerMask whatIsGround;
+	[SerializeField] private Transform[] groundPoints;
+	[SerializeField] private float groundRadius;
+	[SerializeField] private LayerMask whatIsGround;
 	private bool isGrounded;
 	private bool jump;
+	private bool canDoubleJump;
+
 
 	//public GameObject bulletPrefab;
 	
 	public override void OnStartLocalPlayer()
 	{
-		// Give Character Starting Values
-		MOVEMENT_SPEED = 8;
-		JUMP_FORCE = 500;
-		facingRight = true;
-
 		// Reference Components
 		myRB = GetComponent<Rigidbody2D>();
+		myCollider = GetComponent<BoxCollider2D>();
 		myAnimator = GetComponent<Animator>();
 
 		// Setup Camera
@@ -55,22 +51,23 @@ public class Player : NetworkBehaviour {
 
 		// Handle Input Every Frame
 		HandleInput();
+		Debug.Log(isGrounded);
 	}
 
 	void FixedUpdate()
 	{
-		// If Local Player...
-		if (isLocalPlayer)
-		{
-			// Get Horizontal Input and Handle Movement
-			horizontal = Input.GetAxis("Horizontal");
-			HandleMovement(horizontal);
+		// Return If Not Local Player
+		if (!isLocalPlayer)
+            return;
 
-			// TODO
-			isGrounded = IsGrounded();
-			HandleAttacks();
-			ResetVars();
-		}
+		// Get Horizontal Input and Handle Movement
+		horizontal = Input.GetAxis("Horizontal");
+		HandleMovement(horizontal);
+
+		// TODO
+		isGrounded = IsGrounded();
+		HandleAttacks();
+		ResetVars();
 	}
 
 	private void HandleMovement(float horizontal)
@@ -126,13 +123,14 @@ public class Player : NetworkBehaviour {
 		}
 	}
 
-	private void HandleInput() {
+	private void HandleInput()
+	{
 		if (Input.GetKeyDown(KeyCode.LeftShift)) {
 			attack = true;
 		}
 
 		if (Input.GetKey(KeyCode.Space)) {
-			jump = true;
+			Jump();
 		}
 	}
 
@@ -147,7 +145,6 @@ public class Player : NetworkBehaviour {
 	[ClientRpc] private void RpcSetDir(bool facingRight)
 	{
 		if (isLocalPlayer)
-			Debug.Log("Local Player Not Calling it");
 		// If Not Local Player, Update Direction On Client...
 		if (!isLocalPlayer)
 		{
@@ -156,14 +153,12 @@ public class Player : NetworkBehaviour {
 				Vector3 playerScale = transform.localScale;
 				playerScale.x = 1;
 				transform.localScale = playerScale;
-				Debug.Log("Right");
 			}
 			else
 			{
 				Vector3 playerScale = transform.localScale;
 				playerScale.x = -1;
 				transform.localScale = playerScale;
-				Debug.Log("Left");
 			}
 		}
 	}
@@ -179,22 +174,30 @@ public class Player : NetworkBehaviour {
 	}
 
 	private bool IsGrounded() {
-		if (myRB.velocity.y <= 0) {
-			foreach (Transform point in groundPoints) {
-				Collider2D[] colliders = Physics2D.OverlapCircleAll(point.position, groundRadius, whatIsGround);
-				for (int i=0; i<colliders.Length; i++) {
-					if (colliders[i].gameObject != gameObject) { // If the item im colliding with isnt the player...
-						return true;
-					}
-				}
+		// If falling...
+		//if (myRB.velocity.y <= 0) {
+			Vector2 topLeft = new Vector2(transform.position.x + myCollider.offset.x - (myCollider.size.x / 2f), transform.position.y + myCollider.offset.y - (myCollider.size.y / 2f));
+			Vector2 bottomRight = new Vector2(transform.position.x + myCollider.offset.x + (myCollider.size.x / 2f), transform.position.y + myCollider.offset.y - (myCollider.size.y / 2f) - .2f);
+			Collider2D[] colliders = Physics2D.OverlapAreaAll(topLeft, bottomRight, whatIsGround);
+			for (int i=0; i<colliders.Length; i++) {
+			 	if (colliders[i].gameObject != gameObject) { // If the item im colliding with isnt the player...
+					return true;
+			 	}
+				Debug.Log(colliders[i]);
 			}
-		}
+			
+		//}
 		return false;
 	}
 
 	private void Jump()
 	{
-		myRB.AddForce(new Vector2(0, JUMP_FORCE));
-		
+		if (isGrounded)
+			myRB.AddForce(new Vector2(0, JUMP_FORCE));
+		else if (canDoubleJump)
+		{
+			myRB.AddForce(new Vector2(0, JUMP_FORCE));
+			canDoubleJump = false;
+		}
 	}
 }
