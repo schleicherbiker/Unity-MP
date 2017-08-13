@@ -8,15 +8,19 @@ public class Rogue_Movement : NetworkBehaviour {
 	// Serialized Vars
 	[SerializeField] private float MOVEMENT_SPEED;
 	[SerializeField] private float JUMP_SPEED;
+	[SerializeField] private float DASH_TIME;
+	[SerializeField] private float DASH_SPEED;
 	[SerializeField] private LayerMask whatIsGround;
-
+	[SerializeField] private GameObject Dagger;
+	
 	// Movement Vars
 	private float horizontal;
 	private bool isGrounded;
 	private bool canDoubleJump;
 	private Rigidbody2D myRB; 
 	private BoxCollider2D myCollider;
-
+	private bool isBusy;
+	
 	// Animation Vars
 	[SyncVar(hook = "SetDir")] public bool facingRight;
 	private Animator myAnimator;
@@ -33,20 +37,20 @@ public class Rogue_Movement : NetworkBehaviour {
 
 		// Setup Camera
 		Vector3 playerPos = this.transform.position;
-		playerPos.z = -1;
+		playerPos.z = -20;
 		Camera.main.transform.position = playerPos;
 		Camera.main.transform.parent = this.transform;
 	}
 
-	void Update() {
-
+	void Update()
+	{
 		// Return If Not Local Player
 		if (!isLocalPlayer)
             return;
-
+		
 		// Handle Input Every Frame
 		HandleInput();
-		Debug.Log(isGrounded);
+		Debug.Log(facingRight);
 	}
 
 	void FixedUpdate()
@@ -61,12 +65,15 @@ public class Rogue_Movement : NetworkBehaviour {
 		
 		// TODO
 		isGrounded = IsGrounded();
-		HandleAttacks();
-		ResetVars();
+		//HandleAttacks();
+		//ResetVars();
 	}
 
 	private void HandleMovement(float horizontal)
 	{
+		if (isBusy)
+			return;
+
 		// If Attacking, Don't Move
 		if (this.myAnimator.GetCurrentAnimatorStateInfo(0).IsTag("Attack")) {
 			myRB.velocity = new Vector2(0, myRB.velocity.y);
@@ -90,6 +97,7 @@ public class Rogue_Movement : NetworkBehaviour {
 				transform.localScale = playerScale;
 
 				// Update Server with [Command] Call
+				facingRight = true;
 				CmdUpdateServerDir(true);
 			}
 		}
@@ -103,27 +111,54 @@ public class Rogue_Movement : NetworkBehaviour {
 				transform.localScale = playerScale;
 
 				// Update Server with [Command] Call
+				facingRight = false;
 				CmdUpdateServerDir(false);
 			}
 		}
 	}
 
-	private void HandleAttacks() {
-		if (attack && !this.myAnimator.GetCurrentAnimatorStateInfo(0).IsTag("Attack")) {
-			myAnimator.SetTrigger("attack");
-		}
-	}
+	// private void HandleAttacks() {
+	// 	if (attack && !this.myAnimator.GetCurrentAnimatorStateInfo(0).IsTag("Attack")) {
+	// 		myAnimator.SetTrigger("attack");
+	// 	}
+	// }
 
 	private void HandleInput()
 	{
-		if (Input.GetKeyDown(KeyCode.LeftShift)) {
-			attack = true;
-		}
+		// if (Input.GetKeyDown(KeyCode.LeftShift)) {
+		// 	attack = true;
+		// }
 
+		// Jump
 		if (Input.GetKeyDown(KeyCode.Space))
 		{
 			Debug.Log("jump!");
 			Jump();
+		}
+
+		// First Move
+		if (Input.GetKeyDown(KeyCode.Alpha1))
+		{
+			Debug.Log("First move!");
+		}
+
+		// Second Move
+		if (Input.GetKeyDown(KeyCode.Alpha2))
+		{
+			Dash();
+			Debug.Log("Second move!");
+		}
+
+		// Third Move
+		if (Input.GetKeyDown(KeyCode.Alpha3)) 
+		{
+			ThrowDagger();
+			Debug.Log("Third move!");
+		}
+
+		// Ultimate Move
+		if (Input.GetKeyDown(KeyCode.Alpha4)) { 
+			Debug.Log("Ultimate move!");
 		}
 	}
 
@@ -133,11 +168,11 @@ public class Rogue_Movement : NetworkBehaviour {
 		if (!isServer)
 			return;
 		RpcSetDir(facingRight);
+		Debug.Log("Hello");
 	}
 
 	[ClientRpc] private void RpcSetDir(bool facingRight)
 	{
-		if (isLocalPlayer)
 		// If Not Local Player, Update Direction On Client...
 		if (!isLocalPlayer)
 		{
@@ -158,7 +193,9 @@ public class Rogue_Movement : NetworkBehaviour {
 
 	[Command] private void CmdUpdateServerDir(bool faceRight)
 	{
+		Debug.Log("1:" + facingRight);
 		facingRight = faceRight;
+		Debug.Log("2:" + facingRight);
 	}
 
 	private void ResetVars() {
@@ -211,5 +248,32 @@ public class Rogue_Movement : NetworkBehaviour {
 			myRB.velocity = new Vector2(myRB.velocity.x, JUMP_SPEED);
 			canDoubleJump = false;
 		}
+	}
+
+	// ======================================================================================================================================================================================================================================\\
+	// ============================================================================================================= ABILITIES ==============================================================================================================\\
+	// ======================================================================================================================================================================================================================================\\
+
+	void Dash()
+	{
+		isBusy = true;
+		myRB.gravityScale = 0;
+		if (this.facingRight)
+			myRB.velocity = new Vector2(DASH_SPEED, 0);
+		else
+			myRB.velocity = new Vector2(-DASH_SPEED, 0);
+		StartCoroutine(StopDash(DASH_TIME));
+	}
+
+	IEnumerator StopDash(float time)
+	{
+		yield return new WaitForSeconds(DASH_TIME);
+		isBusy = false;
+		myRB.gravityScale = 2.5f;
+	} 
+
+	void ThrowDagger()
+	{
+		Instantiate(Dagger, transform);
 	}
 }

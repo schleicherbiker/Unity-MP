@@ -5,10 +5,22 @@ using UnityEngine.Networking;
 
 public class Rogue_Abilities : NetworkBehaviour {
 
-	// Use this for initialization
+	// Serialized Vars
+	[SerializeField] private GameObject Dagger;
+	[SerializeField] private float DASH_TIME;
+	[SerializeField] private float DASH_SPEED;
+
+	// Movement Vars
+	private Rigidbody2D myRB; 
+
+	// Ability Vars
+	public bool isBusy;
+
+	// Use this for initialization	
 	void Start ()
 	{
-		
+		isBusy = false;
+		myRB = GetComponent<Rigidbody2D>();
 	}
 	
 	// Update is called once per frame
@@ -44,19 +56,28 @@ public class Rogue_Abilities : NetworkBehaviour {
 		}
 
 		// Ultimate Move
-		if (Input.GetKeyDown(KeyCode.Alpha4)) {
+		if (Input.GetKeyDown(KeyCode.Alpha4)) { 
 			Debug.Log("Ultimate move!");
 		}
 	}
 
 	void Dash()
 	{
-
+		isBusy = true;
+		myRB.gravityScale = 0;
+		myRB.velocity = new Vector2(10f, 10f);
+		StartCoroutine(StopDash(DASH_TIME));
 	}
 
+	IEnumerator StopDash(float time)
+	{
+		yield return new WaitForSeconds(2f);
+		isBusy = false;
+		myRB.gravityScale = 2.5f;
+	} 	
 
 	void ThrowDagger()
 	{
-
+		Instantiate(Dagger, transform);
 	}
 }

@@ -13,7 +13,10 @@ public class Dagger : MonoBehaviour {
 		myRB = GetComponent<Rigidbody2D>();
 		myCollider = GetComponent<BoxCollider2D>();
 
-		myRB.velocity = new Vector2(DAGGER_SPEED, 0);
+		var targetPos3 = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+		var targetPos = new Vector2(targetPos3.x, targetPos3.y);
+
+		myRB.velocity = (targetPos.normalized * DAGGER_SPEED);
 	}
 
 }
