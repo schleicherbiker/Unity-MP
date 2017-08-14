@@ -4,19 +4,23 @@ using UnityEngine;
 
 public class Dagger : MonoBehaviour {
 
-	[SerializeField] private float DAGGER_SPEED;
-	private Rigidbody2D myRB; 
-	private BoxCollider2D myCollider;
+	public float SPIN_SPEED;
+	private bool facingRight;
 
 	void Start ()
 	{
-		myRB = GetComponent<Rigidbody2D>();
-		myCollider = GetComponent<BoxCollider2D>();
+		// if (transform.parent != null)
+		// {
+		// 	GameObject player = transform.parent.gameObject;
+		// 	Debug.Log(player.GetComponent<Rogue_Movement>().facingRight);
+		// } else {
+		// 	Debug.Log(transform.parent);
+		// }
 
-		var targetPos3 = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-		var targetPos = new Vector2(targetPos3.x, targetPos3.y);
-
-		myRB.velocity = (targetPos.normalized * DAGGER_SPEED);
 	}
 
+	void FixedUpdate()
+	{
+		 	transform.Rotate(0, 0, SPIN_SPEED * Time.deltaTime);
+	}
 }

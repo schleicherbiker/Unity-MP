@@ -112,7 +112,7 @@ bc68edb0af574bf79f9550ead8ebae5c UnityEngine.HoloLens.dll:UnityEngine.Audio.Audi
 463516d5b5fe8e67a0a24c48f2095b04 UnityEngine.HoloLens.dll:UnityEngine.EventSystems.HoloLensInputModule
 c2275a8bfbb9f9942cad75ecdfded41d UnityEngine.HoloLens.dll:UnityEngine.VR.WSA.SpatialMappingCollider
 45f3431f0103c41611e8d4eec3d439df UnityEngine.HoloLens.dll:UnityEngine.VR.WSA.SpatialMappingRenderer
-7a8b4f4e22fd2e13c358381b3b7d9085 Assembly-CSharp.dll:.Dagger
+eba8b7c3281ab2c6305bc935752d49fe Assembly-CSharp.dll:.Dagger
 fc1e0f4d8439d9928083474691511a13 UnityEngine.Networking.dll:UnityEngine.Networking.NetworkAnimator
 05524b8f659e7bfe5756d1335fec24ba UnityEngine.Networking.dll:UnityEngine.Networking.NetworkBehaviour
 60b2bb652410a5867a5ab9a01cd38461 UnityEngine.Networking.dll:UnityEngine.Networking.NetworkDiscovery
@@ -137,7 +137,7 @@ c2275a8bfbb9f9942cad75ecdfded41d UnityEngine.HoloLens.dll:UnityEngine.VR.WSA.Spa
 45f3431f0103c41611e8d4eec3d439df UnityEngine.HoloLens.dll:UnityEngine.VR.WSA.SpatialMappingRenderer
 d8ae1884163cc1f46fdbfb91219d8f24 Assembly-CSharp-firstpass.dll:.AdvancedNetworkManager
 596bdff26594e0d97b77fcea5587d836 Assembly-CSharp.dll:.NATHelperTester
-561f9452ad915cb54f74ece66452b371 Assembly-CSharp.dll:.Rogue_Movement
+8352d7b4b473af97052aa7c9c0572110 Assembly-CSharp.dll:.Rogue_Movement
 e9bdabf9265d758d56f01bb188916fa8 Assembly-CSharp.dll:.ExampleMigrationManager
 57efddcdaa6d9f7aeac54da934ebb951 Assembly-CSharp-firstpass.dll:NATTraversal.NATLobbyManager
 9d178a32937c7fac8f23a949ac137f70 Assembly-CSharp-firstpass.dll:NATTraversal.NATLobbyPlayer

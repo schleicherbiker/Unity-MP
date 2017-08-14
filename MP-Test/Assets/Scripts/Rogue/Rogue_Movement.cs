@@ -4,16 +4,11 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 public class Rogue_Movement : NetworkBehaviour {
-	
-	// Serialized Vars
+
+	// Movement Vars
 	[SerializeField] private float MOVEMENT_SPEED;
 	[SerializeField] private float JUMP_SPEED;
-	[SerializeField] private float DASH_TIME;
-	[SerializeField] private float DASH_SPEED;
 	[SerializeField] private LayerMask whatIsGround;
-	[SerializeField] private GameObject Dagger;
-	
-	// Movement Vars
 	private float horizontal;
 	private bool isGrounded;
 	private bool canDoubleJump;
@@ -27,6 +22,10 @@ public class Rogue_Movement : NetworkBehaviour {
 
 	// Ability Vars
 	private bool attack;
+	[SerializeField] private float DASH_TIME;
+	[SerializeField] private float DASH_SPEED;
+	[SerializeField] private float DAGGER_SPEED;
+	[SerializeField] private GameObject daggerPrefab;
 
 	public override void OnStartLocalPlayer()
 	{
@@ -39,7 +38,12 @@ public class Rogue_Movement : NetworkBehaviour {
 		Vector3 playerPos = this.transform.position;
 		playerPos.z = -20;
 		Camera.main.transform.position = playerPos;
-		Camera.main.transform.parent = this.transform;
+		Camera.main.transform.parent = transform;
+
+		// Asign Layer
+		GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+		gameObject.layer = LayerMask.NameToLayer("Player" + players.Length.ToString());
+		Debug.Log("Player" + players.Length.ToString());
 	}
 
 	void Update()
@@ -50,7 +54,6 @@ public class Rogue_Movement : NetworkBehaviour {
 		
 		// Handle Input Every Frame
 		HandleInput();
-		Debug.Log(facingRight);
 	}
 
 	void FixedUpdate()
@@ -132,28 +135,24 @@ public class Rogue_Movement : NetworkBehaviour {
 		// Jump
 		if (Input.GetKeyDown(KeyCode.Space))
 		{
-			Debug.Log("jump!");
 			Jump();
 		}
 
 		// First Move
 		if (Input.GetKeyDown(KeyCode.Alpha1))
 		{
-			Debug.Log("First move!");
 		}
 
 		// Second Move
 		if (Input.GetKeyDown(KeyCode.Alpha2))
 		{
 			Dash();
-			Debug.Log("Second move!");
 		}
 
 		// Third Move
 		if (Input.GetKeyDown(KeyCode.Alpha3)) 
 		{
 			ThrowDagger();
-			Debug.Log("Third move!");
 		}
 
 		// Ultimate Move
@@ -238,13 +237,11 @@ public class Rogue_Movement : NetworkBehaviour {
 	{
 		if (isGrounded)
 		{
-			Debug.Log("Normal Jump!");
 			myRB.velocity = new Vector2(myRB.velocity.x, JUMP_SPEED);
 			isGrounded = false;
 		}	
 		else if (canDoubleJump)
 		{
-			Debug.Log("Double Jump!");
 			myRB.velocity = new Vector2(myRB.velocity.x, JUMP_SPEED);
 			canDoubleJump = false;
 		}
@@ -274,6 +271,25 @@ public class Rogue_Movement : NetworkBehaviour {
 
 	void ThrowDagger()
 	{
-		Instantiate(Dagger, transform);
+		// Get Correct Direction
+		Vector3 dir3 = Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position;
+		Vector2 dir = new Vector2(dir3.x, dir3.y);
+		dir = dir.normalized * DAGGER_SPEED;
+
+		// Spawn Dagger with Correct Spin Direction
+		if (facingRight)
+			CmdThrowDagger(dir, -1000f);
+		else
+			CmdThrowDagger(dir, 1000f);
+		
+	}
+
+	[Command] void CmdThrowDagger(Vector3 dir, float spin)
+	{
+		var dagger = (GameObject) Instantiate(daggerPrefab, transform.position, transform.rotation);
+		dagger.GetComponent<Rigidbody2D>().velocity = dir;
+		dagger.GetComponent<Dagger>().SPIN_SPEED = spin;
+		Destroy(dagger, 2.0f);
+		NetworkServer.Spawn(dagger);
 	}
 }

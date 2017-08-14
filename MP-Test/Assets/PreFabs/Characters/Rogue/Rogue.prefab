@@ -27,9 +27,9 @@ GameObject:
   - component: {fileID: 114557914902857674}
   - component: {fileID: 114496939592278812}
   - component: {fileID: 114420109212288104}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Rogue
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -41,7 +41,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1617201966549390}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -13.268541, y: -3.2615108, z: 0}
+  m_LocalPosition: {x: -20.077108, y: 6.958461, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -122,13 +122,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MOVEMENT_SPEED: 10
   JUMP_SPEED: 16
-  DASH_TIME: 0.18
-  DASH_SPEED: 60
   whatIsGround:
     serializedVersion: 2
-    m_Bits: 512
-  Dagger: {fileID: 1315425454275482, guid: 3f047dafd705e6a41839cfb1e5198a3f, type: 2}
+    m_Bits: 768
   facingRight: 1
+  DASH_TIME: 0.18
+  DASH_SPEED: 60
+  DAGGER_SPEED: 12
+  daggerPrefab: {fileID: 1315425454275482, guid: 3f047dafd705e6a41839cfb1e5198a3f,
+    type: 2}
 --- !u!114 &114496939592278812
 MonoBehaviour:
   m_ObjectHideFlags: 1
