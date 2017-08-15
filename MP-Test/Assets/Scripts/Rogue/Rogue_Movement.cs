@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.Networking.NetworkSystem;
+using UnityEngine.Networking.Match;
 
 public class Rogue_Movement : NetworkBehaviour {
 
@@ -27,6 +29,16 @@ public class Rogue_Movement : NetworkBehaviour {
 	[SerializeField] private float DAGGER_SPEED;
 	[SerializeField] private GameObject daggerPrefab;
 
+	void Start()
+	{
+		if (!facingRight)
+		{
+			Vector3 playerScale = transform.localScale;
+			playerScale.x = -1;
+			transform.localScale = playerScale;
+		}		
+	}
+
 	public override void OnStartLocalPlayer()
 	{
 		// Reference Components
@@ -39,11 +51,6 @@ public class Rogue_Movement : NetworkBehaviour {
 		playerPos.z = -20;
 		Camera.main.transform.position = playerPos;
 		Camera.main.transform.parent = transform;
-
-		// Asign Layer
-		GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
-		gameObject.layer = LayerMask.NameToLayer("Player" + players.Length.ToString());
-		Debug.Log("Player" + players.Length.ToString());
 	}
 
 	void Update()
@@ -167,26 +174,25 @@ public class Rogue_Movement : NetworkBehaviour {
 		if (!isServer)
 			return;
 		RpcSetDir(facingRight);
-		Debug.Log("Hello");
 	}
 
 	[ClientRpc] private void RpcSetDir(bool facingRight)
 	{
 		// If Not Local Player, Update Direction On Client...
-		if (!isLocalPlayer)
+		if (isLocalPlayer)
+			return;
+
+		if (facingRight)
 		{
-			if (facingRight)
-			{
-				Vector3 playerScale = transform.localScale;
-				playerScale.x = 1;
-				transform.localScale = playerScale;
-			}
-			else
-			{
-				Vector3 playerScale = transform.localScale;
-				playerScale.x = -1;
-				transform.localScale = playerScale;
-			}
+			Vector3 playerScale = transform.localScale;
+			playerScale.x = 1;
+			transform.localScale = playerScale;
+		}
+		else
+		{
+			Vector3 playerScale = transform.localScale;
+			playerScale.x = -1;
+			transform.localScale = playerScale;
 		}
 	}
 

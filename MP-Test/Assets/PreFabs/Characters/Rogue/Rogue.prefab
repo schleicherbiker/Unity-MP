@@ -27,6 +27,7 @@ GameObject:
   - component: {fileID: 114557914902857674}
   - component: {fileID: 114496939592278812}
   - component: {fileID: 114420109212288104}
+  - component: {fileID: 114350477231035322}
   m_Layer: 0
   m_Name: Rogue
   m_TagString: Player
@@ -109,6 +110,17 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
+--- !u!114 &114350477231035322
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1617201966549390}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac8c509473d49cd4c898a5efbb36ca7d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114420109212288104
 MonoBehaviour:
   m_ObjectHideFlags: 1

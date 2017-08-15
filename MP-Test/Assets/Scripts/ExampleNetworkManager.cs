@@ -141,11 +141,11 @@ public class ExampleNetworkManager : NATTraversal.NetworkManager
     {
         if (guid == 0)
         {
-            Debug.Log("Failed to connect to Facilitator");
+            // Debug.Log("Failed to connect to Facilitator");
         }
         else
         {
-            Debug.Log("Facilitator connected");
+            // Debug.Log("Facilitator connected");
         }
     }
 
@@ -168,7 +168,7 @@ public class ExampleNetworkManager : NATTraversal.NetworkManager
     public override void OnServerConnect(NetworkConnection conn)
     {
         base.OnServerConnect(conn);
-
+        Debug.Log("THis is called here here i am thisgsgsd");
         NetworkServer.RegisterHandler(MsgType.OtherTestMessage, OnTestMessage);
     }
 
