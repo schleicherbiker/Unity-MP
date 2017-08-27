@@ -16,18 +16,23 @@ public class Rogue_Movement : NetworkBehaviour {
 	private bool canDoubleJump;
 	private Rigidbody2D myRB; 
 	private BoxCollider2D myCollider;
-	private bool isBusy;
+	private bool canCast = true;
+	private bool canMove = true;
 	
 	// Animation Vars
 	[SyncVar(hook = "SetDir")] public bool facingRight;
 	private Animator myAnimator;
 
 	// Ability Vars
-	private bool attack;
 	[SerializeField] private float DASH_TIME;
 	[SerializeField] private float DASH_SPEED;
+	[SerializeField] private float DASH_CD;
 	[SerializeField] private float DAGGER_SPEED;
+	[SerializeField] private float DAGGER_CD;
 	[SerializeField] private GameObject daggerPrefab;
+	private int dashCharges = 3;
+
+
 
 	void Start()
 	{
@@ -46,15 +51,18 @@ public class Rogue_Movement : NetworkBehaviour {
 		myCollider = GetComponent<BoxCollider2D>();
 		myAnimator = GetComponent<Animator>();
 
-		// Setup Camera
-		Vector3 playerPos = this.transform.position;
+		// Setup Camera and player Z pos
+		Vector3 playerPos = transform.position;
 		playerPos.z = -20;
 		Camera.main.transform.position = playerPos;
 		Camera.main.transform.parent = transform;
+		playerPos.z = -10;
+		transform.position = playerPos;
 	}
 
 	void Update()
 	{
+		Debug.Log(dashCharges);
 		// Return If Not Local Player
 		if (!isLocalPlayer)
             return;
@@ -81,17 +89,11 @@ public class Rogue_Movement : NetworkBehaviour {
 
 	private void HandleMovement(float horizontal)
 	{
-		if (isBusy)
+		if (!canMove)
 			return;
-
-		// If Attacking, Don't Move
-		if (this.myAnimator.GetCurrentAnimatorStateInfo(0).IsTag("Attack")) {
-			myRB.velocity = new Vector2(0, myRB.velocity.y);
-		} 
-		// Else Set Normal Movespeed
-		else {
-			myRB.velocity = new Vector2(horizontal * MOVEMENT_SPEED, myRB.velocity.y);
-		}
+ 
+		// Set Normal Movespeed
+		myRB.velocity = new Vector2(horizontal * MOVEMENT_SPEED, myRB.velocity.y);
 
 		// Set Animator Speed
 		myAnimator.SetFloat("speed", Mathf.Abs(horizontal));
@@ -129,7 +131,7 @@ public class Rogue_Movement : NetworkBehaviour {
 
 	// private void HandleAttacks() {
 	// 	if (attack && !this.myAnimator.GetCurrentAnimatorStateInfo(0).IsTag("Attack")) {
-	// 		myAnimator.SetTrigger("attack");
+	// 		
 	// 	}
 	// }
 
@@ -145,15 +147,22 @@ public class Rogue_Movement : NetworkBehaviour {
 			Jump();
 		}
 
+		// Auto Attack
+		if (Input.GetMouseButtonDown(0) && canCast)
+		{
+			AutoAttack();
+		}
+
 		// First Move
 		if (Input.GetKeyDown(KeyCode.Alpha1))
 		{
 		}
 
 		// Second Move
-		if (Input.GetKeyDown(KeyCode.Alpha2))
+		if (Input.GetKeyDown(KeyCode.Alpha2) && canCast)
 		{
-			Dash();
+			if (dashCharges > 0)
+				Dash();
 		}
 
 		// Third Move
@@ -198,13 +207,11 @@ public class Rogue_Movement : NetworkBehaviour {
 
 	[Command] private void CmdUpdateServerDir(bool faceRight)
 	{
-		Debug.Log("1:" + facingRight);
 		facingRight = faceRight;
-		Debug.Log("2:" + facingRight);
 	}
 
 	private void ResetVars() {
-		attack = false;
+		// attack = false;
 	}
 
 	private bool IsGrounded()
@@ -257,22 +264,52 @@ public class Rogue_Movement : NetworkBehaviour {
 	// ============================================================================================================= ABILITIES ==============================================================================================================\\
 	// ======================================================================================================================================================================================================================================\\
 
+	void AutoAttack()
+	{
+		canCast = false;
+		myAnimator.SetTrigger("attack");
+		canCast = true;
+	}
+
 	void Dash()
 	{
-		isBusy = true;
+		// Recharge dashes if < 3
+		if (dashCharges == 3)
+		{
+			StartCoroutine(AddDash());
+		}
+			
+		canCast = false;
+		canMove = false;
+		dashCharges--;
+
 		myRB.gravityScale = 0;
 		if (this.facingRight)
 			myRB.velocity = new Vector2(DASH_SPEED, 0);
 		else
 			myRB.velocity = new Vector2(-DASH_SPEED, 0);
-		StartCoroutine(StopDash(DASH_TIME));
+		StartCoroutine(StopDash());
+		// TODO StopCOroutine
 	}
 
-	IEnumerator StopDash(float time)
+	IEnumerator StopDash()
 	{
 		yield return new WaitForSeconds(DASH_TIME);
-		isBusy = false;
+		canMove = true;
+		canCast = true;
 		myRB.gravityScale = 2.5f;
+	} 
+
+	IEnumerator AddDash()
+	{
+		yield return new WaitForSeconds(DASH_CD);
+		if (dashCharges < 3)
+		{
+			dashCharges++;
+			if (dashCharges < 3)
+				StartCoroutine(AddDash());
+		}
+			
 	} 
 
 	void ThrowDagger()

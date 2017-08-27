@@ -140,7 +140,9 @@ MonoBehaviour:
   facingRight: 1
   DASH_TIME: 0.18
   DASH_SPEED: 60
+  DASH_CD: 3
   DAGGER_SPEED: 12
+  DAGGER_CD: 3
   daggerPrefab: {fileID: 1315425454275482, guid: 3f047dafd705e6a41839cfb1e5198a3f,
     type: 2}
 --- !u!114 &114496939592278812
