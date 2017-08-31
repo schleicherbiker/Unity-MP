@@ -7,6 +7,9 @@ using UnityEngine.Networking.Match;
 
 public class Rogue_Movement : NetworkBehaviour {
 
+	// Game Vars
+	public bool isTeamOne;
+
 	// Movement Vars
 	[SerializeField] private float MOVEMENT_SPEED;
 	[SerializeField] private float JUMP_SPEED;
@@ -41,7 +44,12 @@ public class Rogue_Movement : NetworkBehaviour {
 			Vector3 playerScale = transform.localScale;
 			playerScale.x = -1;
 			transform.localScale = playerScale;
-		}		
+		}
+
+		
+		
+		
+		//Debug.Log(gameObject.layer.Substring(gameObject.layer.Length-1));
 	}
 
 	public override void OnStartLocalPlayer()
@@ -62,7 +70,6 @@ public class Rogue_Movement : NetworkBehaviour {
 
 	void Update()
 	{
-		Debug.Log(dashCharges);
 		// Return If Not Local Player
 		if (!isLocalPlayer)
             return;
@@ -332,6 +339,8 @@ public class Rogue_Movement : NetworkBehaviour {
 		var dagger = (GameObject) Instantiate(daggerPrefab, transform.position, transform.rotation);
 		dagger.GetComponent<Rigidbody2D>().velocity = dir;
 		dagger.GetComponent<Dagger>().SPIN_SPEED = spin;
+		dagger.GetComponent<Dagger>().team = gameObject.GetComponent<SetTeam>().team;
+		Debug.Log("The team that threw the dagger is " + gameObject.GetComponent<SetTeam>().team);
 		Destroy(dagger, 2.0f);
 		NetworkServer.Spawn(dagger);
 	}

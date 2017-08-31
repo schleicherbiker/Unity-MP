@@ -28,6 +28,8 @@ GameObject:
   - component: {fileID: 114496939592278812}
   - component: {fileID: 114420109212288104}
   - component: {fileID: 114350477231035322}
+  - component: {fileID: 114424729969408984}
+  - component: {fileID: 114652617493757628}
   m_Layer: 0
   m_Name: Rogue
   m_TagString: Player
@@ -132,6 +134,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad2f143e26ee3e94084f179b5833d34e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isTeamOne: 0
   MOVEMENT_SPEED: 10
   JUMP_SPEED: 16
   whatIsGround:
@@ -140,11 +143,23 @@ MonoBehaviour:
   facingRight: 1
   DASH_TIME: 0.18
   DASH_SPEED: 60
-  DASH_CD: 3
+  DASH_CD: 5
   DAGGER_SPEED: 12
   DAGGER_CD: 3
   daggerPrefab: {fileID: 1315425454275482, guid: 3f047dafd705e6a41839cfb1e5198a3f,
     type: 2}
+--- !u!114 &114424729969408984
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1617201966549390}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f89f0d71be1010f48a2545f5042e9b6f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentHealth: 150
 --- !u!114 &114496939592278812
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -217,6 +232,17 @@ MonoBehaviour:
     i15: 184
   m_ServerOnly: 0
   m_LocalPlayerAuthority: 1
+--- !u!114 &114652617493757628
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1617201966549390}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 309688ad409c8e541855b95a2e39d00f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!212 &212234392831017540
 SpriteRenderer:
   m_ObjectHideFlags: 1

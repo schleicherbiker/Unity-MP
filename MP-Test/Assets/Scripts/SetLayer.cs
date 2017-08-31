@@ -20,7 +20,6 @@ public class SetLayer : NetworkBehaviour {
 			gameObject.layer = layer;
 			CmdSetLayer(layer);
 		}
-			
 	}
 
 	[Command] private void CmdSetLayer(int layer)

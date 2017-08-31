@@ -102,6 +102,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SPIN_SPEED: 100
+  isTeamOne: 0
 --- !u!114 &114207853169270954
 MonoBehaviour:
   m_ObjectHideFlags: 1
