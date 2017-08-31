@@ -1,24 +1,26 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.Networking.NetworkSystem;
 
 public class SetLayer : NetworkBehaviour {
 
-	[SyncVar(hook = "SetNewLayer")] private int layer;
+	[SyncVar(hook = "SetNewLayer")] private int layer; // When local player determines correct layer, link to RPC tp update existing remote clients
 
 	void Start ()
 	{
-		gameObject.layer = layer;
-
-		GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
-		layer = LayerMask.NameToLayer("Player" + players.Length.ToString());
-
-		if (isLocalPlayer)
+		// If not local player, just assign layer based on the servers value for the other player
+		if (!isLocalPlayer)
 		{
 			gameObject.layer = layer;
-			CmdSetLayer(layer);
+		}
+
+		// If local player...
+		if (isLocalPlayer)
+		{
+			GameObject[] players = GameObject.FindGameObjectsWithTag("Player"); // Determine correct layer
+			layer = LayerMask.NameToLayer("Player" + players.Length.ToString()); 
+			gameObject.layer = layer; // Assign correct layer
+			CmdSetLayer(layer); // Update server to have correct value
 		}
 	}
 
@@ -37,11 +39,10 @@ public class SetLayer : NetworkBehaviour {
 
 	[ClientRpc] private void RpcSetNewLayer(int layer)
 	{
-		// If Not Local Player, Update Layer On Client...
-		if (isLocalPlayer)
-			return;
-
-		Debug.Log("Changing player layer to " + layer);
-		gameObject.layer = layer;
+		// If not local player, update layer of other player on your client
+		if (!isLocalPlayer)
+		{
+			gameObject.layer = layer;
+		}
 	}
 }

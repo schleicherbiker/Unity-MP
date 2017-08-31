@@ -1,5 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿//using System.Collections;
+//using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.Networking.NetworkSystem;
@@ -9,47 +9,45 @@ public class SetTeam : NetworkBehaviour {
 	private bool isFFA = false;
 	private bool is2Team = true;	
 	private GameObject[] players;
-
-	[SyncVar(hook = "SetTeamNum")] public int team;
+	[SyncVar(hook = "SetTeamNum")] public int team; // When local player determines correct team, link to RPC tp update existing remote clients
 
 	void Start()
 	{
-		// Return if not local player
+		// If not local player, other player should have correct team already
 		if (!isLocalPlayer)
 			return;
-
-		// Get number of players
-		players = GameObject.FindGameObjectsWithTag("Player");		
-
-		// If FFA...
-		if (isFFA)
+		
+		// If local player...
+		if (isLocalPlayer)
 		{
-			CmdSetTeam(players.Length);
-			team = players.Length;
-		}
+			players = GameObject.FindGameObjectsWithTag("Player"); // Get number of players
 
-		// If 2 Teams...
-		else if (is2Team)
-		{
-			Debug.Log("sdfsdf" + players.Length % 2);
-			if (players.Length % 2 == 1)
+			// If it's Free For All...
+			if (isFFA)
 			{
-				CmdSetTeam(1);
-				team = 1;
-			} else
-			{
-				CmdSetTeam(2);
-				team = 2;
+				team = players.Length; // Update local players team...
+				CmdSetTeam(players.Length); // Update server...
 			}
-				
+
+			// Else if only 2 teams...
+			else if (is2Team)
+			{
+				if (players.Length % 2 == 1) // Odd players get team 1...
+				{
+					team = 1;
+					CmdSetTeam(1);
+				} else // Even players are team two
+				{
+					team = 2;
+					CmdSetTeam(2);
+				}
+			}
 		}
 	}
 
 	[Command] private void CmdSetTeam(int teamNum)
 	{
 		team = teamNum;
-		Debug.Log("teamNum="+teamNum);
-		Debug.Log("team="+team);
 	}
 
 	private void SetTeamNum(int teamNum)
@@ -62,11 +60,10 @@ public class SetTeam : NetworkBehaviour {
 
 	[ClientRpc] private void RpcSetTeam(int teamNum)
 	{
-		// If Not Local Player, Update Team On Client...
-		if (isLocalPlayer)
-			return;
-
-		Debug.Log("Changing remote player team to " + teamNum);
-		team = teamNum;
+		// If not local player, update team of other player on your client
+		if (!isLocalPlayer)
+		{
+			team = teamNum;
+		}
 	}
 }
