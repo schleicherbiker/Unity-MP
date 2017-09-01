@@ -35,8 +35,6 @@ public class Rogue_Movement : NetworkBehaviour {
 	[SerializeField] private GameObject daggerPrefab;
 	private int dashCharges = 3;
 
-
-
 	void Start()
 	{
 		if (!facingRight)
@@ -321,12 +319,12 @@ public class Rogue_Movement : NetworkBehaviour {
 
 	void ThrowDagger()
 	{
-		// Get Correct Direction
+		// Get dagger direction
 		Vector3 dir3 = Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position;
 		Vector2 dir = new Vector2(dir3.x, dir3.y);
 		dir = dir.normalized * DAGGER_SPEED;
 
-		// Spawn Dagger with Correct Spin Direction
+		// Spawn dagger with correct spin direction
 		if (facingRight)
 			CmdThrowDagger(dir, -1000f);
 		else
@@ -338,7 +336,7 @@ public class Rogue_Movement : NetworkBehaviour {
 	{
 		var dagger = (GameObject) Instantiate(daggerPrefab, transform.position, transform.rotation);
 		dagger.GetComponent<Rigidbody2D>().velocity = dir;
-		dagger.GetComponent<Dagger>().SPIN_SPEED = spin;
+		// dagger.GetComponent<Dagger>().SPIN_SPEED = spin;
 		dagger.GetComponent<Dagger>().team = gameObject.GetComponent<SetTeam>().team;
 		Debug.Log("The team that threw the dagger is " + gameObject.GetComponent<SetTeam>().team);
 		Destroy(dagger, 2.0f);

@@ -1,11 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
+using UnityEngine.Networking.NetworkSystem;
 
-public class Dagger : MonoBehaviour {
+public class Dagger : NetworkBehaviour {
 
-	public float SPIN_SPEED;
-    public int team;
+	[SyncVar] public float SPIN_SPEED;
+    [SyncVar] public int team;
     
     void Start()
     {
@@ -23,18 +25,15 @@ public class Dagger : MonoBehaviour {
                 var health = col.gameObject.GetComponent<Health>();
                 health.TakeDamage(10);
                 Debug.Log(col.gameObject + " from team " + col.gameObject.GetComponent<SetTeam>().team + " has taken 10 damage from " + team);
-                //Destroy(gameObject);
+                Destroy(gameObject);
             }
         }
-        else
+        else // Else if colliding with terrain
             Destroy(gameObject);
-        
-
-        // Else if colliding with terrain...
     }
 
 	void FixedUpdate()
 	{
-		 	transform.Rotate(0, 0, SPIN_SPEED * Time.deltaTime);
+		transform.Rotate(0, 0, SPIN_SPEED * Time.deltaTime);
 	}
 }

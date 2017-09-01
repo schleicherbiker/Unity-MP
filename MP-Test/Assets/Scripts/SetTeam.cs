@@ -1,6 +1,4 @@
-﻿//using System.Collections;
-//using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.Networking.NetworkSystem;
 
@@ -26,6 +24,11 @@ public class SetTeam : NetworkBehaviour {
 			if (isFFA)
 			{
 				team = players.Length; // Update local players team...
+				// Move player to correct spawn position
+				if (team == 1)
+					gameObject.transform.position = GameObject.Find("SpawnPoint1").transform.position;
+				else
+					gameObject.transform.position = GameObject.Find("SpawnPoint2").transform.position; 
 				CmdSetTeam(players.Length); // Update server...
 			}
 
@@ -35,10 +38,12 @@ public class SetTeam : NetworkBehaviour {
 				if (players.Length % 2 == 1) // Odd players get team 1...
 				{
 					team = 1;
+					gameObject.transform.position = GameObject.Find("SpawnPoint1").transform.position;
 					CmdSetTeam(1);
 				} else // Even players are team two
 				{
 					team = 2;
+					gameObject.transform.position = GameObject.Find("SpawnPoint2").transform.position;
 					CmdSetTeam(2);
 				}
 			}
