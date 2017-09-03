@@ -11,36 +11,53 @@ public class Health : NetworkBehaviour {
 	public int numLives = 3;
 	public RectTransform healthBar;
 	private float healthBarSize;
+	private Vector3 healthBarScale;
 
 	public void Start()
 	{
 		healthBarSize = healthBar.sizeDelta.x;
+		healthBarScale = new Vector3(1, 1, 1);
+	}
+
+	void Update()
+	{
+		healthBar.transform.localScale = healthBarScale;
 	}
 
 	public void TakeDamage(int amount)
 	{
 		// Check if server...
-		if (!isServer)
-			return;
+		if (isServer)
+		{	
+			// Take Damage
+			currentHealth -= amount;
 
-		// Take Damage
-		currentHealth -= amount;
-
-		// Check health/lives
-		if (currentHealth <= 0)
-		{
-			gameObject.transform.position = GameObject.Find("SpawnPoint" + gameObject.GetComponent<SetTeam>().team).transform.position;
-			currentHealth = 0;
-			numLives--;
-			if (numLives == 0)
+			// Check health/lives
+			if (currentHealth <= 0)
 			{
-				Debug.Log("Somebody wins!");
+				currentHealth = maxHealth; // Subtract health...
+				RpcRespawn(); // Respawn...
+				numLives--; // Subtract life...
+				if (numLives == 0)
+				{
+					Debug.Log("Somebody wins!");
+					// TODO Game reset code here...
+				}
 			}
 		}
+
+
 	}
-	
 	void OnChangeHealth(int currentHealth)
 	{
 		healthBar.sizeDelta = new Vector2(((float)currentHealth/(float)maxHealth)*healthBarSize, healthBar.sizeDelta.y);
+	}
+
+	[ClientRpc] void RpcRespawn()
+	{
+		if (isLocalPlayer)
+		{
+			gameObject.transform.position = GameObject.Find("SpawnPoint" + gameObject.GetComponent<SetTeam>().team).transform.position;
+		}
 	}
 }

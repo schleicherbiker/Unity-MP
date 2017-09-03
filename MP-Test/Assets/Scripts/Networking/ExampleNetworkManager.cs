@@ -1,5 +1,4 @@
 #if !DISABLE_NAT_TRAVERSAL
-#if UNITY_5_4 || UNITY_5_5 || UNITY_5_6 || UNITY_5_7 || UNITY_5_8 || UNITY_5_9 || UNITY_6 || UNITY_2017 || UNITY_2018 || UNITY_2019 || UNITY_2020
 #define NEW_STUFF
 #endif
 using System.Collections.Generic;
@@ -168,13 +167,14 @@ public class ExampleNetworkManager : NATTraversal.NetworkManager
     public override void OnServerConnect(NetworkConnection conn)
     {
         base.OnServerConnect(conn);
-        Debug.Log("THis is called here here i am thisgsgsd");
+        Debug.Log("On Server connect");
         NetworkServer.RegisterHandler(MsgType.OtherTestMessage, OnTestMessage);
     }
 
     public override void OnClientConnect(NetworkConnection conn)
     {
         base.OnClientConnect(conn);
+        Debug.Log("On client connect");
         RegisterHandlerClient(MsgType.OtherTestMessage, OnTestMessage);
     }
 }
